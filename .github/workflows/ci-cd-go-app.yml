@@ -1,0 +1,58 @@
+name: Golang-App-Workflow
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-GoApplication:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Golang
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.21'
+          check-latest: true
+
+      - name: Cache Go Modules
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/go-build
+            ~/go/pkg/mod
+          key: ${{ runner.os }}-go-mod-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-mod-
+
+      - name: Install Golang Dependencies
+        run: go mod download
+
+      - name: Build Golang App
+        run: GOOS=linux go build -o build/MusicAlbumAPI -v
+
+      - name: Display Build Artifacts
+        run: ls -R build/
+
+      - name: Run Unit Tests
+        run: go test ./...
+
+      - name: Build Docker Image
+        run: |
+          docker build -t my-dockerhub-username/my-app:latest -t my-dockerhub-username/my-app:${{ github.sha }} .
+        env:
+          DOCKER_BUILDKIT: 1
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+
+      - name: Push Docker Image
+        run: |
+          docker push my-dockerhub-username/my-app:latest
+          docker push my-dockerhub-username/my-app:${{ github.sha }}

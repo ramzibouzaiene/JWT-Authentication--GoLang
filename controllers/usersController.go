@@ -114,3 +114,7 @@ func Validate(c *gin.Context) {
 		"message": user,
 	})
 }
+
+func HelloWorld(c *gin.Context) {
+    c.String(http.StatusOK, "Hello, World!")
+}
