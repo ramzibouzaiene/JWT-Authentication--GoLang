@@ -42,7 +42,7 @@ jobs:
 
       - name: Build Docker Image
         run: |
-          docker build -t my-dockerhub-username/my-app:latest -t my-dockerhub-username/my-app:${{ github.sha }} .
+          docker build -t ramzibouzaiene/my-app:latest -t ramzibouzaiene/my-app:${{ github.sha }} .
         env:
           DOCKER_BUILDKIT: 1
 
@@ -54,5 +54,5 @@ jobs:
 
       - name: Push Docker Image
         run: |
-          docker push my-dockerhub-username/my-app:latest
-          docker push my-dockerhub-username/my-app:${{ github.sha }}
+          docker push ramzibouzaiene/my-app:latest
+          docker push ramzibouzaiene/my-app:${{ github.sha }}
